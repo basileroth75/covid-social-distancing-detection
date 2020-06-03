@@ -1,0 +1,7 @@
+image_coordinates:
+    p2 : [1879 ,  228 ] # TOP LEFT
+    p1 : [ 1022 ,  91 ] # BOTTOM LEFT
+    p4 : [1637 ,  1072] # TOP RIGHT 
+    p3 : [9 ,  883] # BOTTOM RIGHT
+    width : 
+    height : 
