@@ -34,6 +34,7 @@ if __name__ == "__main__":
     while (True):
         cv2.imshow(windowName, img)
         if len(list_points) == 4:
+            # Return a dict to the YAML file
             config_data = dict(
                 B = dict(
                     p2 = list_points[3],
@@ -42,12 +43,11 @@ if __name__ == "__main__":
                     p3 = list_points[1],
                     width = width,
                     height = height,
-                )
-            )
+                    ))
+            # Write the result to the config file
             with open('../conf/config_birdview.yml', 'w') as outfile:
                 yaml.dump(config_data, outfile, default_flow_style=False)
             break
         if cv2.waitKey(20) == 27:
             break
-    
     cv2.destroyAllWindows()
