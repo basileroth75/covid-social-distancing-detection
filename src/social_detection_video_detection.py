@@ -1,5 +1,6 @@
 # import the necessary packages
-#import adrian_detection
+import adrian_detection
+import bird_view_transfo
 import numpy as np
 import imutils
 import cv2
@@ -12,7 +13,7 @@ import yaml
 """
 with open("../conf/config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile)
-width, height = 0
+width, height = 0,0
 corner_points = []
 print("[ Loading config file ] ...")
 for section in cfg:
@@ -28,10 +29,7 @@ for section in cfg:
 """ Load the YOLO weights and the config parameter
 """
 print("[ Loading YOLO model ] ...")
-# derive the paths to the YOLO weights and model configuration
-weightsPath = os.path.sep.join(["yolo-coco", "yolov3.weights"])
-configPath = os.path.sep.join(["yolo-coco", "yolov3.cfg"])
-net = cv2.dnn.readNetFromDarknet(configPath, weightsPath)
+net = cv2.dnn.readNetFromDarknet("../yolo-coco/yolov3.cfg", "../yolo-coco/yolov3.weights")
 # determine only the *output* layer names that we need from YOLO
 ln = net.getLayerNames()
 ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
