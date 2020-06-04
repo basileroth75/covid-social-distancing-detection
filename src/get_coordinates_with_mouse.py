@@ -17,7 +17,8 @@ windowName = 'MouseCallback'
 cv2.namedWindow(windowName)
 
 # Load the image 
-img = cv2.imread("../img/static_frame_from_video.jpg")
+img_path = "../img/static_frame_from_video.jpg"
+img = cv2.imread(img_path)
 
 # Get the size of the image for the calibration
 width,height,_ = img.shape
@@ -36,13 +37,14 @@ if __name__ == "__main__":
         if len(list_points) == 4:
             # Return a dict to the YAML file
             config_data = dict(
-                B = dict(
+                image_parameters = dict(
                     p2 = list_points[3],
                     p1 = list_points[2],
                     p4 = list_points[0],
                     p3 = list_points[1],
-                    width = width,
-                    height = height,
+                    width_og = width,
+                    height_og = height,
+                    img_path = img_path,
                     ))
             # Write the result to the config file
             with open('../conf/config_birdview.yml', 'w') as outfile:

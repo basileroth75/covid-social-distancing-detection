@@ -2,13 +2,13 @@ import numpy as np
 import cv2
 
 
-def compute_perspective_transform(p1,p2,p3,p4,width,height):
+def compute_perspective_transform(corner_points,width,height):
 	""" Compute the transformation matrix
     @ p1,p2,p3,p4 : 4 corner points 
     @ height, width : needed parameter to determinen the matrix
     """
 	# Create an array out of theses points
-	corner_points_array = np.float32([p1,p2,p3,p4])
+	corner_points_array = np.float32(corner_points)
 	# Create an array with the 
 	img_params = np.float32([[0,0],[width,0],[0,height],[width,height]])
 	# Compute the transformation matrix

@@ -1,29 +1,29 @@
-# import the necessary packages
-import adrian_detection
-import bird_view_transfo
+from bird_view_transfo import compute_perspective_transform
+from adrian_detection import detect_people
 import numpy as np
+import itertools
 import imutils
+import math
+import yaml
 import cv2
 import os
-import math
-import itertools
-import yaml
+
 
 """ Load the config parameters from the YAML file
 """
-with open("../conf/config.yml", "r") as ymlfile:
+with open("../conf/config_birdview.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile)
-width, height = 0,0
+width_og, height_og = 0,0
 corner_points = []
 print("[ Loading config file ] ...")
 for section in cfg:
-	corner_points.append(cfg["image_coordinates"]["p1"])
-	corner_points.append(cfg["image_coordinates"]["p2"])
-	corner_points.append(cfg["image_coordinates"]["p3"])
-	corner_points.append(cfg["image_coordinates"]["p4"])
-	width = cfg["image_coordinates"]["width"]
-	height = cfg["image_coordinates"]["height"]
-
+	corner_points.append(cfg["image_parameters"]["p1"])
+	corner_points.append(cfg["image_parameters"]["p2"])
+	corner_points.append(cfg["image_parameters"]["p3"])
+	corner_points.append(cfg["image_parameters"]["p4"])
+	width_og = int(cfg["image_parameters"]["width_og"])
+	height_og = int(cfg["image_parameters"]["height_og"])
+	img_path = cfg["image_parameters"]["img_path"]
 
 
 """ Load the YOLO weights and the config parameter
@@ -36,10 +36,11 @@ ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
 
 # Compute the transformation matrix from the original frame
-matrix = compute_perspective_transform(corner_points,width,height)
-# Apply the transformation to the image to get the format of transformed plan
-imgOG = cv2.warpPerspective(image,matrix,(width,height))
-height,width,_ = imgOG.shape
+matrix = compute_perspective_transform(corner_points,width_og,height_og)
+image = cv2.imread(img_path)
+imgOutput = cv2.warpPerspective(image,matrix,(width_og,height_og))
+height,width,_ = imgOutput.shape
+
 
 
 ######################################################

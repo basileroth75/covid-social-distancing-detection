@@ -1,6 +1,3 @@
-# import the necessary packages
-from .social_distancing_config import NMS_THRESH
-from .social_distancing_config import MIN_CONF
 import numpy as np
 import cv2
 
@@ -37,7 +34,7 @@ def detect_people(frame, net, ln, personIdx=0):
 			# filter detections by (1) ensuring that the object
 			# detected was a person and (2) that the minimum
 			# confidence is met
-			if classID == personIdx and confidence > MIN_CONF:
+			if classID == personIdx and confidence > 0.3:
 				# scale the bounding box coordinates back relative to
 				# the size of the image, keeping in mind that YOLO
 				# actually returns the center (x, y)-coordinates of
@@ -59,7 +56,7 @@ def detect_people(frame, net, ln, personIdx=0):
 
 	# apply non-maxima suppression to suppress weak, overlapping
 	# bounding boxes
-	idxs = cv2.dnn.NMSBoxes(boxes, confidences, MIN_CONF, NMS_THRESH)
+	idxs = cv2.dnn.NMSBoxes(boxes, confidences, 0.3, 0.3)
 
 	# ensure at least one detection exists
 	if len(idxs) > 0:
