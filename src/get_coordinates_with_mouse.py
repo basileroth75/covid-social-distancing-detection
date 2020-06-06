@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import yaml
+import imutils
+
  
 # Define the callback function that we are going to use to get our coordinates
 def CallBackFunc(event, x, y, flags, param):
@@ -12,9 +14,26 @@ def CallBackFunc(event, x, y, flags, param):
         list_points.append([x,y])
 
 
+
+video_name = input("Enter the exact name of the video (including .mp4 or else) : ")
+
+
+vs = cv2.VideoCapture("../video/"+video_name)
+# Loop until the end of the video stream
+while True:    
+    # Load the frame and test if it has reache the end of the video
+    (frame_exists, frame) = vs.read()
+    frame = imutils.resize(frame, width=1000)
+    cv2.imwrite("../img/static_frame_from_video.jpg",frame)
+    # cv2.imwrite("../img/static_frame_from_video.jpg",frame)
+    #cv2.imshow("frame",frame)
+    #cv2.waitKey(0)
+    break
+
 # Create a black image and a window
 windowName = 'MouseCallback'
 cv2.namedWindow(windowName)
+
 
 # Load the image 
 img_path = "../img/static_frame_from_video.jpg"
