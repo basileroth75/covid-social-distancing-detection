@@ -8,7 +8,8 @@ import yaml
 import cv2
 
 
-""" Load the config parameters from the YAML file
+""" 
+Load the config parameters from the YAML file
 """
 with open("../conf/config_birdview.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile)
@@ -24,7 +25,8 @@ for section in cfg:
 	height_og = int(cfg["image_parameters"]["height_og"])
 	img_path = cfg["image_parameters"]["img_path"]
 
-""" Load the YOLO weights and the config parameter
+""" 
+Load the YOLO weights and the config parameter
 """
 print("[ Loading YOLO model ] ...")
 net = cv2.dnn.readNetFromDarknet("../yolo-coco/yolov3.cfg", "../yolo-coco/yolov3.weights")
@@ -60,6 +62,7 @@ while True:
 	if not frame_exists:
 		break
 	else:
+		# Resize the image to the correct size
 		frame = imutils.resize(frame, width=1000)
 		# Detect the person in the frame and test if there is more 
 		results = detect_people(frame, net, ln, 0)
@@ -103,6 +106,11 @@ while True:
 					(x2, y2) = results[index_pt2][2]
 
 
+	line_thickness = 2
+	cv2.line(frame, (corner_points[0][0], corner_points[0][1]), (corner_points[1][0], corner_points[1][1]), (0, 255, 0), thickness=line_thickness)
+	cv2.line(frame, (corner_points[1][0], corner_points[1][1]), (corner_points[2][0], corner_points[2][1]), (0, 255, 0), thickness=line_thickness)
+	cv2.line(frame, (corner_points[2][0], corner_points[2][1]), (corner_points[3][0], corner_points[3][1]), (0, 255, 0), thickness=line_thickness)
+	cv2.line(frame, (corner_points[3][0], corner_points[3][1]), (corner_points[0][0], corner_points[0][1]), (0, 255, 0), thickness=line_thickness)
 
 	cv2.imshow("Bird view", blank_image)
 	cv2.imshow("Frame", frame)

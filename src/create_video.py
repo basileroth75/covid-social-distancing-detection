@@ -8,7 +8,9 @@ onlyfiles = [f for f in listdir("../video/View_001") if isfile(join("../video/Vi
 filename_array = []
 img_array = []
 
-for i in range(0,len(onlyfiles)):
+number_files = input("Prompt the number of frames you want to use for the video : ")
+
+for i in range(0,int(number_files)):
 	number = ""
 	if i < 10:
 		number = "00"+str(i)
@@ -27,9 +29,7 @@ for filename in filename_array:
 	img_array.append(img)
 
 fourcc2 = cv2.VideoWriter_fourcc(*"MJPG")
-output_video_2 = cv2.VideoWriter("output_2.avi", fourcc2, 25,(width, height), True)
-
+output_video_2 = cv2.VideoWriter("../video/pets2009.avi", fourcc2, 25,(width, height), True)
 
 for i in range(len(img_array)):
 	output_video_2.write(img_array[i])
-output_video_2.release()
