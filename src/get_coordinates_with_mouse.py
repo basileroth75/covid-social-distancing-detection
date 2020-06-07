@@ -17,17 +17,16 @@ def CallBackFunc(event, x, y, flags, param):
 
 video_name = input("Enter the exact name of the video (including .mp4 or else) : ")
 
+size_frame = input("Prompt the size of the image you want to get : ")
+
 
 vs = cv2.VideoCapture("../video/"+video_name)
 # Loop until the end of the video stream
 while True:    
     # Load the frame and test if it has reache the end of the video
     (frame_exists, frame) = vs.read()
-    frame = imutils.resize(frame, width=1000)
+    frame = imutils.resize(frame, width=int(size_frame))
     cv2.imwrite("../img/static_frame_from_video.jpg",frame)
-    # cv2.imwrite("../img/static_frame_from_video.jpg",frame)
-    #cv2.imshow("frame",frame)
-    #cv2.waitKey(0)
     break
 
 # Create a black image and a window
@@ -64,6 +63,7 @@ if __name__ == "__main__":
                     width_og = width,
                     height_og = height,
                     img_path = img_path,
+                    size_frame = size_frame,
                     ))
             # Write the result to the config file
             with open('../conf/config_birdview.yml', 'w') as outfile:
