@@ -8,9 +8,11 @@ onlyfiles = [f for f in listdir("../video/View_001") if isfile(join("../video/Vi
 filename_array = []
 img_array = []
 
-number_files = input("Prompt the number of frames you want to use for the video : ")
+number_files_start = input("Prompt the starting frame number : ")
+number_files_end = input("Prompt the ending frame number : ")
 
-for i in range(0,int(number_files)):
+
+for i in range(int(number_files_start),int(number_files_end)):
 	number = ""
 	if i < 10:
 		number = "00"+str(i)
