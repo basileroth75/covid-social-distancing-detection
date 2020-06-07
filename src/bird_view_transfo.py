@@ -23,8 +23,6 @@ def compute_point_perspective_transformation(matrix,list_downoids):
 	# Compute the new coordinates of our points
 	list_points_to_detect = np.float32(list_downoids).reshape(-1, 1, 2)
 	transformed_points = cv2.perspectiveTransform(list_points_to_detect, matrix)
-	# Compute the warped image with the matrix
-	imgOutput = cv2.warpPerspective(image,matrix,(width,height))
 	# Loop over the points and add them to the list that will be returned
 	transformed_points_list = list()
 	for i in range(0,transformed_points.shape[0]):
