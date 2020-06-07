@@ -24,6 +24,7 @@ for section in cfg:
 	width_og = int(cfg["image_parameters"]["width_og"])
 	height_og = int(cfg["image_parameters"]["height_og"])
 	img_path = cfg["image_parameters"]["img_path"]
+	size_frame = cfg["image_parameters"]["size_frame"]
 
 """ 
 Load the YOLO weights and the config parameter
@@ -50,12 +51,23 @@ height,width,_ = imgOutput.shape
 ######################################################
 video_name = input("Enter the exact name of the video (including .mp4 or else) : ")
 
+distance_minimum = input("Prompt the size of the minimal distance between 2 pedestrians : ")
+img = cv2.imread("chemin_1")
+
+
 vs = cv2.VideoCapture("../video/"+video_name)
 output_video_1,output_video_2 = None,None
 # Loop until the end of the video stream
 while True:
 	# Create a full black frame 
 	blank_image = np.zeros((height,width,3), np.uint8)
+
+	#width = 350
+	#height = 450
+	dim = (height, width)
+ 
+	# resize image
+	blank_image = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
 	
 	# Load the frame and test if it has reache the end of the video
 	(frame_exists, frame) = vs.read()
@@ -63,7 +75,7 @@ while True:
 		break
 	else:
 		# Resize the image to the correct size
-		frame = imutils.resize(frame, width=1000)
+		frame = imutils.resize(frame, width=int(size_frame))
 		# Detect the person in the frame and test if there is more 
 		results = detect_people(frame, net, ln, 0)
 
@@ -91,7 +103,7 @@ while True:
 
 			list_indexes = list(itertools.combinations(range(len(transformed_downoids)), 2))
 			for i,pair in enumerate(itertools.combinations(transformed_downoids, r=2)):
-				if math.sqrt( (pair[0][0] - pair[1][0])**2 + (pair[0][1] - pair[1][1])**2 ) < 50:
+				if math.sqrt( (pair[0][0] - pair[1][0])**2 + (pair[0][1] - pair[1][1])**2 ) < int(distance_minimum):
 					cv2.circle(blank_image, (pair[0][0],pair[0][1]), 20, (0, 0, 255), 2)
 					cv2.circle(blank_image, (pair[0][0],pair[0][1]), 3, (0, 0, 255), -1)
 					cv2.circle(blank_image, (pair[1][0],pair[1][1]), 20, (0, 0, 255), 2)
@@ -106,14 +118,13 @@ while True:
 					(x2, y2) = results[index_pt2][2]
 
 
-	line_thickness = 2
-	cv2.line(frame, (corner_points[0][0], corner_points[0][1]), (corner_points[1][0], corner_points[1][1]), (0, 255, 0), thickness=line_thickness)
-	cv2.line(frame, (corner_points[1][0], corner_points[1][1]), (corner_points[2][0], corner_points[2][1]), (0, 255, 0), thickness=line_thickness)
-	cv2.line(frame, (corner_points[2][0], corner_points[2][1]), (corner_points[3][0], corner_points[3][1]), (0, 255, 0), thickness=line_thickness)
-	cv2.line(frame, (corner_points[3][0], corner_points[3][1]), (corner_points[0][0], corner_points[0][1]), (0, 255, 0), thickness=line_thickness)
+	cv2.line(frame, (corner_points[0][0], corner_points[0][1]), (corner_points[1][0], corner_points[1][1]), (0, 255, 0), thickness=1)
+	cv2.line(frame, (corner_points[1][0], corner_points[1][1]), (corner_points[3][0], corner_points[3][1]), (0, 255, 0), thickness=1)
+	cv2.line(frame, (corner_points[0][0], corner_points[0][1]), (corner_points[2][0], corner_points[2][1]), (0, 255, 0), thickness=1)
+	cv2.line(frame, (corner_points[3][0], corner_points[3][1]), (corner_points[2][0], corner_points[2][1]), (0, 255, 0), thickness=1)
 
 	cv2.imshow("Bird view", blank_image)
-	cv2.imshow("Frame", frame)
+	cv2.imshow("Original picture", frame)
 	key = cv2.waitKey(1) & 0xFF
 
 	if output_video_1 is None:
