@@ -3,6 +3,7 @@ from adrian_detection import detect_people
 import numpy as np
 import itertools
 import imutils
+import time
 import math
 import yaml
 import cv2
@@ -31,7 +32,6 @@ Load the YOLO weights and the config parameter
 """
 print("[ Loading YOLO model ] ...")
 net = cv2.dnn.readNetFromDarknet("../yolo-coco/yolov3.cfg", "../yolo-coco/yolov3.weights")
-# determine only the *output* layer names that we need from YOLO
 ln = net.getLayerNames()
 ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
@@ -41,6 +41,10 @@ matrix = compute_perspective_transform(corner_points,width_og,height_og)
 image = cv2.imread(img_path)
 imgOutput = cv2.warpPerspective(image,matrix,(width_og,height_og))
 height,width,_ = imgOutput.shape
+blank_image = np.zeros((height,width,3), np.uint8)
+height = blank_image.shape[0]
+width = blank_image.shape[1] 
+dim = (width, height)
 
 
 
@@ -59,13 +63,9 @@ vs = cv2.VideoCapture("../video/"+video_name)
 output_video_1,output_video_2 = None,None
 # Loop until the end of the video stream
 while True:
+	start_time = time.time()
 	# Create a full black frame 
-	blank_image = np.zeros((height,width,3), np.uint8)
-
-	#width = 350
-	#height = 450
-	dim = (height, width)
- 
+	img = cv2.imread("../img/chemin_1.png")
 	# resize image
 	blank_image = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
 	
@@ -127,15 +127,18 @@ while True:
 	cv2.imshow("Original picture", frame)
 	key = cv2.waitKey(1) & 0xFF
 
+	end_time = time.time()
+	print("Elapsed Time:", end_time-start_time)
+
 	if output_video_1 is None:
 		fourcc1 = cv2.VideoWriter_fourcc(*"MJPG")
-		output_video_1 = cv2.VideoWriter("output_1.avi", fourcc1, 25,(frame.shape[1], frame.shape[0]), True)
+		output_video_1 = cv2.VideoWriter("../output/video.avi", fourcc1, 25,(frame.shape[1], frame.shape[0]), True)
 	elif output_video_1 is not None:
 		output_video_1.write(frame)
 
 	if output_video_2 is None:	
 		fourcc2 = cv2.VideoWriter_fourcc(*"MJPG")
-		output_video_2 = cv2.VideoWriter("output_2.avi", fourcc2, 25,(blank_image.shape[1], blank_image.shape[0]), True)
+		output_video_2 = cv2.VideoWriter("../output/bird_view.avi", fourcc2, 25,(blank_image.shape[1], blank_image.shape[0]), True)
 	elif output_video_2 is not None:
 		output_video_2.write(blank_image)
 
