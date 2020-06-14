@@ -49,7 +49,7 @@ def get_centroids_and_groundpoints(array_boxes_detected):
 	array_centroids,array_groundpoints = [],[] # Initialize empty centroid and ground point lists 
 	for index,box in enumerate(array_boxes_detected):
 		# Draw the bounding box 
-		cv2.rectangle(frame,(box[1],box[0]),(box[3],box[2]),COLOR_GREEN,1)
+		# c
 		# Get the both important points
 		centroid,ground_point = get_points_from_box(box)
 		array_centroids.append(centroid)
@@ -155,8 +155,6 @@ width = blank_image.shape[1]
 dim = (width, height)
 
 
-
-
 ######################################################
 #########									 #########
 # 				START THE VIDEO STREAM               #
@@ -201,18 +199,24 @@ while True:
 
 		# Check if 2 or more people have been detected (otherwise no need to detect)
 		if len(transformed_downoids) >= 2:
+			for index,downoid in enumerate(transformed_downoids):
+				if not (downoid[0] > width or downoid[0] < 0 or downoid[1] > height or downoid[1] < 0 ):
+					# print("DROP FROM THE LIST")
+					cv2.rectangle(frame,(array_boxes_detected[index][1],array_boxes_detected[index][0]),(array_boxes_detected[index][3],array_boxes_detected[index][2]),COLOR_GREEN,1)
+
 			# Iterate over every possible 2 by 2 between the points combinations 
 			list_indexes = list(itertools.combinations(range(len(transformed_downoids)), 2))
 			for i,pair in enumerate(itertools.combinations(transformed_downoids, r=2)):
 				# Check if the distance between each combination of points is less than the minimum distance chosen
 				if math.sqrt( (pair[0][0] - pair[1][0])**2 + (pair[0][1] - pair[1][1])**2 ) < int(distance_minimum):
 					# Change the colors of the points that are too close from each other to red
-					change_color_on_topview(pair)
-					# Get the equivalent indexes of these points in the original frame and change the color to red
-					index_pt1 = list_indexes[i][0]
-					index_pt2 = list_indexes[i][1]
-					cv2.rectangle(frame,(array_boxes_detected[index_pt1][1],array_boxes_detected[index_pt1][0]),(array_boxes_detected[index_pt1][3],array_boxes_detected[index_pt1][2]),COLOR_RED,1)
-					cv2.rectangle(frame,(array_boxes_detected[index_pt2][1],array_boxes_detected[index_pt2][0]),(array_boxes_detected[index_pt2][3],array_boxes_detected[index_pt2][2]),COLOR_RED,1)
+					if not (pair[0][0] > width or pair[0][0] < 0 or pair[0][1] > height or pair[0][1] < 0 or pair[1][0] > width or pair[1][0] < 0 or pair[1][1] > height or pair[1][1] < 0):
+						change_color_on_topview(pair)
+						# Get the equivalent indexes of these points in the original frame and change the color to red
+						index_pt1 = list_indexes[i][0]
+						index_pt2 = list_indexes[i][1]
+						cv2.rectangle(frame,(array_boxes_detected[index_pt1][1],array_boxes_detected[index_pt1][0]),(array_boxes_detected[index_pt1][3],array_boxes_detected[index_pt1][2]),COLOR_RED,1)
+						cv2.rectangle(frame,(array_boxes_detected[index_pt2][1],array_boxes_detected[index_pt2][0]),(array_boxes_detected[index_pt2][3],array_boxes_detected[index_pt2][2]),COLOR_RED,1)
 
 
 	# Draw the green rectangle to delimitate the detection zone
