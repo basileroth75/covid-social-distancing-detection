@@ -1,5 +1,4 @@
 from bird_view_transfo import compute_perspective_transform,compute_point_perspective_transformation
-from adrian_detection import detect_people
 from tf_model_object_detection import Model 
 from colors import bcolors
 import numpy as np
@@ -15,7 +14,7 @@ import os
 COLOR_RED = (0, 0, 255)
 COLOR_GREEN = (0, 255, 0)
 COLOR_BLUE = (255, 0, 0)
-BIG_CIRCLE = 20
+BIG_CIRCLE = 60
 SMALL_CIRCLE = 3
 
 
@@ -136,23 +135,27 @@ if video_num == "":
 else :
 	video_path = "../video/"+video_names_list[int(video_num)]
 
+
 ######################################### 
 #		    Minimal distance			#
 #########################################
 distance_minimum = input("Prompt the size of the minimal distance between 2 pedestrians : ")
 if distance_minimum == "":
-	distance_minimum = "70"
+	distance_minimum = "110"
 
 
-# Compute the transformation matrix from the original frame
+######################################### 
+#     Compute transformation matrix		#
+#########################################
+# Compute  transformation matrix from the original frame
 matrix,imgOutput = compute_perspective_transform(corner_points,width_og,height_og,cv2.imread(img_path))
-# image = cv2.imread(img_path)
-#imgOutput = cv2.warpPerspective(image,matrix,(width_og,height_og))
 height,width,_ = imgOutput.shape
 blank_image = np.zeros((height,width,3), np.uint8)
 height = blank_image.shape[0]
 width = blank_image.shape[1] 
 dim = (width, height)
+
+
 
 
 ######################################################
@@ -163,9 +166,7 @@ dim = (width, height)
 vs = cv2.VideoCapture(video_path)
 output_video_1,output_video_2 = None,None
 # Loop until the end of the video stream
-while True:
-	start_time = time.time()
-	
+while True:	
 	# Load the image of the ground and resize it to the correct size
 	img = cv2.imread("../img/chemin_1.png")
 	bird_view_img = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
@@ -200,9 +201,8 @@ while True:
 		# Check if 2 or more people have been detected (otherwise no need to detect)
 		if len(transformed_downoids) >= 2:
 			for index,downoid in enumerate(transformed_downoids):
-				if not (downoid[0] > width or downoid[0] < 0 or downoid[1] > height or downoid[1] < 0 ):
-					# print("DROP FROM THE LIST")
-					cv2.rectangle(frame,(array_boxes_detected[index][1],array_boxes_detected[index][0]),(array_boxes_detected[index][3],array_boxes_detected[index][2]),COLOR_GREEN,1)
+				if not (downoid[0] > width or downoid[0] < 0 or downoid[1] > height+200 or downoid[1] < 0 ):
+					cv2.rectangle(frame,(array_boxes_detected[index][1],array_boxes_detected[index][0]),(array_boxes_detected[index][3],array_boxes_detected[index][2]),COLOR_GREEN,2)
 
 			# Iterate over every possible 2 by 2 between the points combinations 
 			list_indexes = list(itertools.combinations(range(len(transformed_downoids)), 2))
@@ -210,40 +210,34 @@ while True:
 				# Check if the distance between each combination of points is less than the minimum distance chosen
 				if math.sqrt( (pair[0][0] - pair[1][0])**2 + (pair[0][1] - pair[1][1])**2 ) < int(distance_minimum):
 					# Change the colors of the points that are too close from each other to red
-					if not (pair[0][0] > width or pair[0][0] < 0 or pair[0][1] > height or pair[0][1] < 0 or pair[1][0] > width or pair[1][0] < 0 or pair[1][1] > height or pair[1][1] < 0):
+					if not (pair[0][0] > width or pair[0][0] < 0 or pair[0][1] > height+200  or pair[0][1] < 0 or pair[1][0] > width or pair[1][0] < 0 or pair[1][1] > height+200  or pair[1][1] < 0):
 						change_color_on_topview(pair)
 						# Get the equivalent indexes of these points in the original frame and change the color to red
 						index_pt1 = list_indexes[i][0]
 						index_pt2 = list_indexes[i][1]
-						cv2.rectangle(frame,(array_boxes_detected[index_pt1][1],array_boxes_detected[index_pt1][0]),(array_boxes_detected[index_pt1][3],array_boxes_detected[index_pt1][2]),COLOR_RED,1)
-						cv2.rectangle(frame,(array_boxes_detected[index_pt2][1],array_boxes_detected[index_pt2][0]),(array_boxes_detected[index_pt2][3],array_boxes_detected[index_pt2][2]),COLOR_RED,1)
+						cv2.rectangle(frame,(array_boxes_detected[index_pt1][1],array_boxes_detected[index_pt1][0]),(array_boxes_detected[index_pt1][3],array_boxes_detected[index_pt1][2]),COLOR_RED,2)
+						cv2.rectangle(frame,(array_boxes_detected[index_pt2][1],array_boxes_detected[index_pt2][0]),(array_boxes_detected[index_pt2][3],array_boxes_detected[index_pt2][2]),COLOR_RED,2)
 
 
 	# Draw the green rectangle to delimitate the detection zone
 	draw_rectangle(corner_points)
-
-	# Show both images
+	# Show both images	
 	cv2.imshow("Bird view", bird_view_img)
 	cv2.imshow("Original picture", frame)
 
-	end_time = time.time()
-	print("Elapsed Time:", end_time-start_time)
 
 	key = cv2.waitKey(1) & 0xFF
 
-	# Write the both outputs video to a local folderr
-	if output_video_1 is None:
+	# Write the both outputs video to a local folder
+	if output_video_1 is None and output_video_2 is None:
 		fourcc1 = cv2.VideoWriter_fourcc(*"MJPG")
 		output_video_1 = cv2.VideoWriter("../output/video.avi", fourcc1, 25,(frame.shape[1], frame.shape[0]), True)
-	elif output_video_1 is not None:
-		output_video_1.write(frame)
-
-	if output_video_2 is None:	
 		fourcc2 = cv2.VideoWriter_fourcc(*"MJPG")
 		output_video_2 = cv2.VideoWriter("../output/bird_view.avi", fourcc2, 25,(bird_view_img.shape[1], bird_view_img.shape[0]), True)
-	elif output_video_2 is not None:
+	elif output_video_1 is not None and output_video_2 is not None:
+		output_video_1.write(frame)
 		output_video_2.write(bird_view_img)
 
-	# if the `q` key was pressed, break from the loop
+	# Break the loop
 	if key == ord("q"):
 		break
