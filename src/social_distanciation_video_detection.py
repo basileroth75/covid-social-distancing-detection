@@ -228,7 +228,7 @@ while True:
 
 	key = cv2.waitKey(1) & 0xFF
 
-	# Write the both outputs video to a local folder
+	# Write the both outputs video to a local folders
 	if output_video_1 is None and output_video_2 is None:
 		fourcc1 = cv2.VideoWriter_fourcc(*"MJPG")
 		output_video_1 = cv2.VideoWriter("../output/video.avi", fourcc1, 25,(frame.shape[1], frame.shape[0]), True)
